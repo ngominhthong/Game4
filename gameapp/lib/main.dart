@@ -11,22 +11,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final wordPair = WordPair.random();
     return MaterialApp(
       title: 'welcome to flutter',
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text("welcome to fluter"),
-        ),
-        /*body: const Center(
-          //child: Text("hello"),
-        ),*/
-        body: Center(
-          //child: Text("hello"),
-          //child: Text(wordPair.asPascalCase),
-          child: RandomWords(),
-        ),
-      ),
+      home: RandomWords(),
     );
   }
 }
@@ -39,9 +26,41 @@ class RandomWords extends StatefulWidget {
 }
 
 class _RandomWordsState extends State<RandomWords> {
+  final _suggestions = <WordPair>[];
+  final _biggerFont = const TextStyle(fontSize: 18.0);
   @override
   Widget build(BuildContext context) {
-    final wordPair = WordPair.random();
-    return Text(wordPair.asPascalCase);
+    /*final wordPair = WordPair.random();
+    return Text(wordPair.asPascalCase);*/
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Starup Name Generator'),
+      ),
+      body: _buildSuggestion(),
+    );
+  }
+
+  @override
+  // TODO: implement widget
+  Widget _buildSuggestion() {
+    return ListView.builder(
+        padding: const EdgeInsets.all(16.0),
+        itemBuilder: (context, i) {
+          if (i.isOdd) return const Divider();
+          final index = i ~/ 2;
+          if (index >= _suggestions.length) {
+            _suggestions.addAll(generateWordPairs().take(10));
+          }
+          return _builRow(_suggestions[index]);
+        });
+  }
+
+  Widget _builRow(WordPair suggestion) {
+    return ListTile(
+      title: Text(
+        suggestion.asPascalCase,
+        style: _biggerFont,
+      ),
+    );
   }
 }
