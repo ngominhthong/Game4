@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 
@@ -28,6 +29,7 @@ class RandomWords extends StatefulWidget {
 class _RandomWordsState extends State<RandomWords> {
   final _suggestions = <WordPair>[];
   final _biggerFont = const TextStyle(fontSize: 18.0);
+  final _saved = <WordPair>{};
   @override
   Widget build(BuildContext context) {
     /*final wordPair = WordPair.random();
@@ -35,6 +37,7 @@ class _RandomWordsState extends State<RandomWords> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Starup Name Generator'),
+        actions: [IconButton(onPressed: _pushSaved, icon: Icon(Icons.list))],
       ),
       body: _buildSuggestion(),
     );
@@ -56,11 +59,48 @@ class _RandomWordsState extends State<RandomWords> {
   }
 
   Widget _builRow(WordPair suggestion) {
+    final alreadySaved = _saved.contains(suggestion);
     return ListTile(
       title: Text(
         suggestion.asPascalCase,
         style: _biggerFont,
       ),
+      trailing: Icon(
+        alreadySaved ? Icons.favorite : Icons.favorite_border,
+        color: alreadySaved ? Colors.red : null,
+      ),
+      onTap: () {
+        setState(() {
+          if (alreadySaved) {
+            _saved.remove(suggestion);
+          } else {
+            _saved.add(suggestion);
+          }
+        });
+      },
     );
+  }
+
+  void _pushSaved() {
+    Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (BuildContext context) {
+      final title = _saved.map((WordPair pair) {
+        return ListTile(
+            title: Text(
+          pair.asPascalCase,
+          style: _biggerFont,
+        ));
+      });
+      final divided = title.isNotEmpty
+          ? ListTile.divideTiles(context: context, tiles: title).toList()
+          : <Widget>[];
+
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Saves Suggest"),
+        ),
+        body: ListView(children: divided),
+      );
+    }));
   }
 }
